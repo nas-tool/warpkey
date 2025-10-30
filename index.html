@@ -3,455 +3,246 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CloudFlare WARP Key</title>
-  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.4.0/dist/reset.css">
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/element-ui/lib/index.js"></script>
+  <title>WARP Key Tool - By wanghaoyu.com.cn</title>
+  <meta name="description" content="WARP Key Tool - 一个简单的WARP Key生成工具，由wanghaoyu.com.cn提供">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vue-i18n@8.24.5/dist/vue-i18n.min.js"></script>
-  <script defer src="https://statistics.wanghaoyu.com.cn/script.js" data-website-id="6356ad68-4066-4b3f-845f-d09517d940ce"></script>
   <style>
-    :root {
-      --primary-color: #409EFF;
-      --secondary-color: #67C23A;
-      --background-color: #f5f7fa;
-      --text-color: #2c3e50;
-      --border-color: #dcdfe6;
+    /* 玻璃拟态 */
+    .glass{
+      background:rgba(255,255,255,.25);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      border:1px solid rgba(255,255,255,.18);
     }
-
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background-color: var(--background-color);
-      color: var(--text-color);
-      line-height: 1.6;
+    .dark .glass{
+      background:rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.1);
     }
-
-    #app {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-      box-sizing: border-box;
+    /* 自定义滚动条 */
+    ::-webkit-scrollbar{width:6px;height:6px}
+    ::-webkit-scrollbar-thumb{@apply bg-slate-400 dark:bg-slate-600 rounded-full}
+    /* 让骨架屏动画更柔和 */
+    .shine{
+      background:linear-gradient(90deg,#f0f0f0 40%,#e0e0e0 50%,#f0f0f0 60%);
+      background-size:200% 100%;
+      animation:shine 1.2s infinite;
     }
-
-    .header {
-      background: #fff;
-      border-bottom: 1px solid var(--border-color);
-      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 20px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .footer {
-      text-align: center;
-      padding: 30px;
-      margin-top: 40px;
-      border-top: 1px solid var(--border-color);
-      background: #fff;
-      box-shadow: 0 -2px 12px 0 rgba(0, 0, 0, 0.1);
-    }
-
-    .el-menu {
-      line-height: 64px;
-      border: none !important;
-    }
-
-    .el-menu-item {
-      padding: 0 25px;
-      font-size: 15px;
-      transition: all 0.3s ease;
-    }
-
-    .el-menu-item:hover {
-      color: var(--primary-color);
-      background-color: rgba(64, 158, 255, 0.1);
-    }
-
-    .el-menu-item.is-active {
-      color: var(--primary-color) !important;
-      border-bottom: 2px solid var(--primary-color);
-    }
-
-    .language-switcher {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .language-switcher a {
-      color: var(--text-color);
-      text-decoration: none;
-      padding: 5px 10px;
-      border-radius: 4px;
-      transition: all 0.3s ease;
-      font-size: 14px;
-    }
-
-    .language-switcher a:hover {
-      color: var(--primary-color);
-      background-color: rgba(64, 158, 255, 0.1);
-    }
-
-    /* 表格样式优化 */
-    .el-table {
-      margin-top: 30px !important;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    }
-
-    .el-table th {
-      background-color: #f5f7fa !important;
-      color: var(--text-color);
-      font-weight: 600;
-      padding: 12px 0;
-    }
-
-    .el-table td {
-      padding: 12px 0;
-    }
-
-    /* 关于页面样式 */
-    .about-section {
-      background: #fff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-      margin-top: 30px;
-    }
-
-    .about-section h2 {
-      color: var(--primary-color);
-      margin-bottom: 20px;
-      font-size: 24px;
-    }
-
-    .about-section p {
-      margin: 15px 0;
-      line-height: 1.8;
-    }
-
-    .about-section a {
-      color: var(--primary-color);
-      text-decoration: none;
-      transition: all 0.3s ease;
-    }
-
-    .about-section a:hover {
-      color: #66b1ff;
-      text-decoration: underline;
-    }
-
-    /* 响应式设计 */
-    @media screen and (max-width: 768px) {
-      #app {
-        padding: 10px;
-      }
-
-      .header {
-        flex-direction: column;
-        padding: 10px;
-      }
-
-      .el-menu {
-        width: 100%;
-      }
-
-      .el-menu-item {
-        padding: 0 15px;
-        font-size: 14px;
-      }
-
-      .language-switcher {
-        margin-top: 10px;
-        margin-bottom: 10px;
-      }
-    }
-
-    /* 加载动画 */
-    .loading-spinner {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100px;
-    }
-
-    .loading-spinner::after {
-      content: '';
-      width: 30px;
-      height: 30px;
-      border: 2px solid var(--primary-color);
-      border-top-color: transparent;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    /* 表格中的复制按钮样式 */
-    .key-cell {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 16px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border-radius: 4px;
-    }
-
-    .key-cell:hover {
-      background-color: rgba(64, 158, 255, 0.1);
-    }
-
-    .key-cell .el-icon-document-copy {
-      font-size: 16px;
-      color: #909399;
-      margin-left: 8px;
-      opacity: 0;
-      transition: all 0.3s ease;
-    }
-
-    .key-cell:hover .el-icon-document-copy {
-      opacity: 1;
-      color: var(--primary-color);
-    }
-
-    /* 消息提示样式优化 */
-    .el-message {
-      min-width: 300px;
-      padding: 15px 20px;
-      border-radius: 8px;
-    }
-
-    .el-message--success {
-      background-color: #f0f9eb;
-      border-color: #e1f3d8;
-    }
-
-    .el-message--error {
-      background-color: #fef0f0;
-      border-color: #fde2e2;
-    }
-
-    /* 工具提示样式优化 */
-    .el-tooltip__popper {
-      font-size: 14px;
-      padding: 8px 12px;
-      border-radius: 4px;
-    }
-
-    /* 页面过渡动画 */
-    .fade-enter-active, .fade-leave-active {
-      transition: opacity 0.3s ease;
-    }
-
-    .fade-enter, .fade-leave-to {
-      opacity: 0;
+    @keyframes shine{to{background-position:-200% 0}}
+    .dark .shine{
+      background:linear-gradient(90deg,#1f2937 40%,#374151 50%,#1f2937 60%);
     }
   </style>
 </head>
-<body>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors">
   <div id="app">
-    <a-layout>
-      <a-layout-header class="header">
-        <el-menu :default-active="selectedMenu" mode="horizontal" class="el-menu" @select="handleMenuSelect">
-          <el-menu-item index="full">{{ $t('menu.fullVersion') }}</el-menu-item>
-          <el-menu-item index="lite">{{ $t('menu.liteVersion') }}</el-menu-item>
-          <el-menu-item index="about">{{ $t('menu.about') }}</el-menu-item>
-          <el-menu-item index="github" @click="goToGitHub">{{ $t('menu.github') }}</el-menu-item>
-          <el-menu-item index="releases" @click="goToReleases">{{ $t('menu.releases') }}</el-menu-item>
-        </el-menu>
-        <div class="language-switcher">
-          <a @click="switchLanguage('en')">{{ $t('language.en') }}</a>
-          <a @click="switchLanguage('zh')">{{ $t('language.zh') }}</a>
+    <!-- 顶部栏 -->
+    <header class="sticky top-0 z-20 glass shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
+        <div class="flex items-center gap-3">
+          <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14/assets/svg/1f310.svg" class="w-7 h-7" alt="🌐">
+          <span class="font-bold text-xl tracking-tight">WARP Key</span>
         </div>
-      </a-layout-header>
-      <a-layout-content style="padding: 20px;">
-        <div v-if="selectedMenu === 'about'" class="about-section">
-          <h2>{{ $t('about.title') }}</h2>
-          <p>{{ $t('about.description') }}</p>
-          <p>{{ $t('about.blog') }}: <a href="https://wanghaoyu.com.cn" target="_blank">wanghaoyu.com.cn</a></p>
-          <p>{{ $t('about.readme') }}: <a href="https://ghproxy.cnproxy.top/https://raw.githubusercontent.com/nas-tool/warpkey/main/README.md" target="_blank">README</a></p>
-          <p>{{ $t('about.update') }}</p>
+
+        <nav class="hidden md:flex items-center gap-2">
+          <button v-for="m in menus" :key="m.key" @click="mode = m.key"
+                  :class="mode===m.key?'bg-sky-500 text-white':'hover:bg-slate-200/60 dark:hover:bg-slate-700/60'"
+                  class="px-3 py-1.5 rounded-lg text-sm transition">
+            {{ t(m.label) }}
+          </button>
+        </nav>
+
+        <div class="flex items-center gap-3">
+          <button @click="toggleDark()" class="p-2 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-700/60 transition" :title="isDark ? 'Light' : 'Dark'">
+            <span v-html="isDark?'☀️':'🌙'"></span>
+          </button>
+          <button @click="switchLang()" class="px-2 py-1 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-700/60 text-sm transition">
+            {{ locale==='en'?'中文':'EN' }}
+          </button>
         </div>
-        <template v-else>
-          <div class="loading-spinner" v-if="loading"></div>
-          <el-table
-            v-else
-            :data="keys"
-            style="width: 100%"
-            :empty-text="$t('table.noData')"
-            @row-click="handleRowClick"
-          >
-            <el-table-column prop="key" :label="$t('table.keyColumn')" min-width="250">
-              <template slot-scope="scope">
-                <el-tooltip :content="$t('table.clickToCopy')" placement="top" :open-delay="500">
-                  <div class="key-cell" @click.stop="copyKey(scope.row.key)">
-                    {{ scope.row.key }}
-                    <i class="el-icon-document-copy"></i>
-                  </div>
-                </el-tooltip>
-              </template>
-            </el-table-column>
-          </el-table>
-        </template>
-      </a-layout-content>
-      <div class="footer">
-        <p>&copy; 2024 CloudFlare WARP Key Collection Tool. Licensed under the MIT License.</p>
-        <p style="margin-top: 10px; font-size: 14px; color: #909399;">
-          <a href="https://github.com/nas-tool/warpkey" target="_blank" style="color: inherit; text-decoration: none;">
-            <i class="el-icon-star-on"></i> Star on GitHub
-          </a>
+      </div>
+    </header>
+
+    <!-- 主内容 -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+      <!-- 关于页 -->
+      <div v-if="mode==='about'" class="glass rounded-2xl p-6 shadow">
+        <h1 class="text-2xl font-bold mb-4">{{ t('aboutTitle') }}</h1>
+        <p class="mb-2">{{ t('aboutDesc') }}</p>
+        <p class="text-sm text-slate-500 dark:text-slate-400">
+          {{ t('update') }}: {{ lastUpdate }}
         </p>
       </div>
-    </a-layout>
+
+      <!-- 密钥列表 -->
+      <div v-else>
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold">{{ t('keyList') }}</h2>
+          <button @click="loadKeys()" class="px-3 py-1.5 rounded-lg glass hover:shadow-md transition text-sm">
+            ↻ {{ t('refresh') }}
+          </button>
+        </div>
+
+        <!-- 过渡区域：骨架屏 ↔ 真实卡片 -->
+        <transition name="fade" mode="out-in">
+          <div v-if="loading" key="skeleton" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div v-for="i in 6" :key="i" class="glass rounded-xl p-4">
+              <div class="h-6 rounded shine"></div>
+            </div>
+          </div>
+
+          <div v-else key="list" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div v-for="(k, i) in keys" :key="i"
+                 @click="copy(k.key)"
+                 class="glass rounded-xl p-4 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition relative group">
+              <div class="text-sm font-mono break-all pr-8">{{ k.key }}</div>
+              <button class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition text-slate-500 hover:text-sky-500" title="Copy">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </transition>
+
+        <div v-if="!keys.length && !loading" class="text-center py-12 text-slate-500">
+          {{ t('noData') }}
+        </div>
+      </div>
+    </main>
+
+    <!-- 底部 -->
+    <footer class="text-center text-xs text-slate-400 py-6">
+      MIT © 2025 WARP Key Tools By <a href="https://github.com/nas-tool" target="_blank" class="underline hover:text-sky-500">NAS Tool</a> |
+      <a href="https://github.com/nas-tool/warpkey" target="_blank" class="underline hover:text-sky-500">GitHub</a>
+    </footer>
+
+    <!-- 复制提示 -->
+    <transition enter-active-class="transition" leave-active-class="transition">
+      <div v-if="copied" class="fixed bottom-6 left-1/2 -translate-x-1/2 glass px-4 py-2 rounded-full text-sm shadow">
+        ✅ {{ t('copied') }}
+      </div>
+    </transition>
   </div>
 
   <script>
     const messages = {
       en: {
-        menu: {
-          fullVersion: 'Full Version',
-          liteVersion: 'Lite Version',
-          about: 'About',
-          github: 'GitHub',
-          releases: 'Releases'
-        },
-        about: {
-          title: 'About',
-          description: 'This project is a CloudFlare WARP key collection tool. It fetches keys from Telegram and stores them locally.',
-          blog: 'You can find more information and updates on my blog',
-          readme: 'For more details, please refer to the',
-          update: 'Keys are updated to GitHub daily at Every Hour. Last update: 2025-10-30 16:09:27. You can directly obtain the latest key from this website.',
-        },
-        language: {
-          en: 'English',
-          zh: '中文'
-        },
-        table: {
-          keyColumn: 'WARP Key',
-          noData: 'No data available',
-          clickToCopy: 'Click to copy',
-          copySuccess: 'Copied to clipboard!',
-          copyFailed: 'Failed to copy, please try again'
-        },
-        notification: {
-          loading: 'Loading...',
-          error: 'Error occurred while fetching data'
-        }
+        full: 'Full Version',
+        lite: 'Lite Version',
+        about: 'About',
+        keyList: 'Available Keys',
+        refresh: 'Refresh',
+        noData: 'No keys yet',
+        copied: 'Copied to clipboard!',
+        aboutTitle: 'About',
+        aboutDesc: 'This project automatically collects Cloudflare WARP keys from Telegram and pushes them to GitHub every hour.',
+        update: 'Last GitHub Actions run'
       },
       zh: {
-        menu: {
-          fullVersion: '完整版',
-          liteVersion: '精简版',
-          about: '关于',
-          github: 'GitHub',
-          releases: 'Releases'
-        },
-        about: {
-          title: '关于',
-          description: '该项目是一个 CloudFlare WARP 密钥收集工具。它从 Telegram 获取密钥并将其存储在本地。',
-          blog: '你可以在我的博客中找到更多信息和更新',
-          readme: '有关详细信息，请参阅',
-          update: '密钥会每个小时自动push到本仓库中,你可以通过本站获取。最后更新: 2025-10-30 16:09:27',
-        },
-        language: {
-          en: 'English',
-          zh: '中文'
-        },
-        table: {
-          keyColumn: 'WARP 密钥',
-          noData: '暂无数据',
-          clickToCopy: '点击复制',
-          copySuccess: '已复制到剪贴板！',
-          copyFailed: '复制失败，请重试'
-        },
-        notification: {
-          loading: '加载中...',
-          error: '获取数据时发生错误'
-        }
+        full: '完整版',
+        lite: '精简版',
+        about: '关于',
+        keyList: '可用密钥',
+        refresh: '刷新',
+        noData: '暂无密钥',
+        copied: '已复制到剪贴板！',
+        aboutTitle: '关于',
+        aboutDesc: '本项目每小时自动从 Telegram 收集 Cloudflare WARP 密钥并推送至 GitHub。',
+        update: '最后一次 GitHub Actions 运行'
       }
-    };
+    }
 
-    new Vue({
-      el: '#app',
-      i18n: new VueI18n({
-        locale: localStorage.getItem('lang') || 'en',
-        messages
-      }),
-      data() {
-        return {
-          selectedMenu: 'full',
-          keys: [],
-          loading: false
-        };
-      },
-      methods: {
-        async fetchKeys() {
-          if (this.selectedMenu === 'about') return;
-          
-          this.loading = true;
-          try {
-            const response = await axios.get(
-              `https://ghproxy.cfd/https://raw.githubusercontent.com/nas-tool/warpkey/main/data/${this.selectedMenu}`
-            );
-            this.keys = response.data.trim().split('\n').map(key => ({ key }));
-          } catch (error) {
-            console.error('Error fetching keys:', error);
-            this.$message.error(this.$t('notification.error'));
-          } finally {
-            this.loading = false;
-          }
-        },
-        handleMenuSelect(index) {
-          this.selectedMenu = index;
-          if (index !== 'about') this.fetchKeys();
-        },
-        switchLanguage(lang) {
-          this.$i18n.locale = lang;
-          localStorage.setItem('lang', lang);
-          window.location.href = `index.html?lang=${lang}`;
-        },
-        goToGitHub() {
-          window.open('https://github.com/nas-tool/warpkey', '_blank');
-        },
-        goToReleases() {
-          window.open('https://github.com/nas-tool/warpkey/releases', '_blank');
-        },
-        async copyKey(key) {
-          try {
-            await navigator.clipboard.writeText(key);
-            this.$message({
-              message: this.$t('table.copySuccess'),
-              type: 'success',
-              duration: 2000
-            });
-          } catch (err) {
-            this.$message({
-              message: this.$t('table.copyFailed'),
-              type: 'error',
-              duration: 2000
-            });
-          }
-        },
-        handleRowClick(row) {
-          this.copyKey(row.key);
+    const { createApp, ref, onMounted, watch } = Vue
+
+    createApp({
+      setup () {
+        const locale = ref(localStorage.getItem('lang') || 'en')
+        const isDark = ref(localStorage.getItem('dark') === 'true')
+        const mode = ref('lite')
+        const keys = ref([])
+        const loading = ref(false)
+        const copied = ref(false)
+        const lastUpdate = ref('')
+
+        const menus = [
+          { key: 'lite', label: 'lite' },
+          { key: 'full', label: 'full' },
+          { key: 'about', label: 'about' }
+        ]
+
+        const t = k => messages[locale.value][k]
+
+        const toggleDark = () => {
+          isDark.value = !isDark.value
+          localStorage.setItem('dark', isDark.value)
+          isDark.value
+            ? document.documentElement.classList.add('dark')
+            : document.documentElement.classList.remove('dark')
         }
-      },
-      mounted() {
-        this.fetchKeys();
+
+        const switchLang = () => {
+          locale.value = locale.value === 'en' ? 'zh' : 'en'
+          localStorage.setItem('lang', locale.value)
+        }
+
+        /* 获取 Actions 最后一次成功运行时间 */
+        const fetchLastUpdate = async () => {
+          try {
+            const { data } = await axios.get('https://api.github.com/repos/nas-tool/warpkey/actions/runs?per_page=1&status=success')
+            const date = data.workflow_runs[0]?.updated_at || ''
+            lastUpdate.value = date
+              ? new Date(date).toLocaleString(locale.value === 'zh' ? 'zh-CN' : 'en-US')
+              : 'N/A'
+          } catch {
+            lastUpdate.value = 'N/A'
+          }
+        }
+
+        const loadKeys = async () => {
+          loading.value = true
+          try {
+            const { data } = await axios.get(
+              `https://ghproxy.cfd/https://raw.githubusercontent.com/nas-tool/warpkey/main/data/${mode.value}`
+            )
+            keys.value = data.trim().split('\n').filter(Boolean).map(k => ({ key: k }))
+          } catch {
+            keys.value = []
+          } finally {
+            loading.value = false
+          }
+        }
+
+        const copy = async text => {
+          try {
+            await navigator.clipboard.writeText(text)
+            copied.value = true
+            setTimeout(() => copied.value = false, 1500)
+          } catch {}
+        }
+
+        watch(mode, () => mode.value !== 'about' && loadKeys())
+
+        onMounted(() => {
+          isDark.value && document.documentElement.classList.add('dark')
+          fetchLastUpdate()
+          mode.value !== 'about' && loadKeys()
+        })
+
+        return { locale, isDark, mode, keys, loading, copied, lastUpdate, menus, t, toggleDark, switchLang, loadKeys, copy }
       }
-    });
+    }).mount('#app')
   </script>
+
+  <!-- 过渡动画 -->
+  <style>
+    .fade-enter-active, .fade-leave-active {
+      transition: opacity .3s;
+    }
+    .fade-enter-from, .fade-leave-to {
+      opacity: 0;
+    }
+  </style>
 </body>
 </html>
