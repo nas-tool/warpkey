@@ -2,8 +2,8 @@ name: Update WarpKey Data
 
 on:
   schedule:
-    - cron: '0 */1 * * *'  # 每小时运行一次
-  workflow_dispatch:  # 允许手动触发
+    - cron: '2 */1 * * *'
+  workflow_dispatch:
 
 jobs:
   update:
