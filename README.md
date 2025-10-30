@@ -6,10 +6,10 @@
 
 You can directly access Warp KEY from the following URL (Update data every hour):
 
-- [https://raw.githubusercontent.com/geeklinux-io/warpkey/main/data/lite](https://raw.githubusercontent.com/geeklinux-io/warpkey/main/data/lite)
-- [https://raw.githubusercontent.com/geeklinux-io/warpkey/main/data/full](https://raw.githubusercontent.com/geeklinux-io/warpkey/main/data/full)
+- [https://raw.githubusercontent.com/nas-tool/warpkey/main/data/lite](https://raw.githubusercontent.com/nas-tool/warpkey/main/data/lite)
+- [https://raw.githubusercontent.com/nas-tool/warpkey/main/data/full](https://raw.githubusercontent.com/nas-tool/warpkey/main/data/full)
 
-You can also obtain it through my GitHub Pages:[CloudFlare WARP Key (geeklinux-io.github.io)](https://geeklinux-io.github.io/warpkey/)
+You can also obtain it through my GitHub Pages:[CloudFlare WARP Key (nas-tool.github.io)](https://nas-tool.github.io/warpkey/)
 
 ## Private Deployment
 
@@ -22,7 +22,7 @@ Make sure you have Go installed. You can download and install Go from the [offic
 Clone this repository to your local environment:
 
 ```bash
-git clone https://github.com/geeklinux-io/warpkey.git
+git clone https://github.com/nas-tool/warpkey.git
 cd warpkey
 ```
 

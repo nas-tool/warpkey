@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: geeklinux-io(GitHub)
-# Blog: https://www.geeklinux.cn
+# Blog: https://wanghaoyu.com.cn
 # Regularly update scripts
 # You can use crontab to schedule tasks to execute this script and submit updates to your GitHub repository
 

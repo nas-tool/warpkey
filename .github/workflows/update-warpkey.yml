@@ -1,0 +1,49 @@
+name: Update WarpKey Data
+
+on:
+  schedule:
+    - cron: '0 */1 * * *'  # 每小时运行一次
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Build warpkey
+        run: |
+          go build -o warpkey-linux-amd64 main.go
+          chmod +x warpkey-linux-amd64
+
+      - name: Run warpkey to update data
+        run: |
+          ./warpkey-linux-amd64
+          
+      - name: Update timestamp in index.html
+        run: |
+          current_time=$(date +"%Y-%m-%d %H:%M:%S")
+          # 更新英文版本的时间戳
+          sed -i "s/Keys are updated to GitHub daily at Every Hour\./Keys are updated to GitHub daily at Every Hour. Last update: $current_time\./g" index.html
+          # 更新中文版本的时间戳
+          sed -i "s/密钥会每个小时自动push到本仓库中,你可以通过本站获取/密钥会每个小时自动push到本仓库中,你可以通过本站获取。最后更新: $current_time/g" index.html
+
+      - name: Commit and push if there are changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          
+          if git status --porcelain | grep -q '^'; then
+            current_time=$(date +"%Y-%m-%d %H:%M:%S")
+            git add ./data index.html
+            git commit -m "🚀Automatic update - $current_time"
+            git push
+          else
+            echo "No changes to commit"
+          fi

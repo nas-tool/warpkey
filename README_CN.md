@@ -8,10 +8,10 @@
 
 可以从以下 URL 直接获取 Warp KEY（每隔一小时更新数据）：
 
-- [https://raw.githubusercontent.com/geeklinux-io/warpkey/main/data/full](https://raw.githubusercontent.com/geeklinux-io/warpkey/main/data/lite)
-- [https://raw.githubusercontent.com/geeklinux-io/warpkey/main/data/full](https://raw.githubusercontent.com/geeklinux-io/warpkey/main/data/full)
+- [https://raw.githubusercontent.com/nas-tool/warpkey/main/data/full](https://raw.githubusercontent.com/nas-tool/warpkey/main/data/lite)
+- [https://raw.githubusercontent.com/nas-tool/warpkey/main/data/full](https://raw.githubusercontent.com/nas-tool/warpkey/main/data/full)
 
-也可以通过我的GitHub Pages中获取：[CloudFlare WARP Key (geeklinux-io.github.io)](https://geeklinux-io.github.io/warpkey/)
+也可以通过我的GitHub Pages中获取：[CloudFlare WARP Key (nas-tool.github.io)](https://nas-tool.github.io/warpkey/)
 
 
 
@@ -26,7 +26,7 @@
 将此仓库克隆到你的本地环境中：
 
 ```bash
-git clone https://github.com/geeklinux-io/warpkey.git
+git clone https://github.com/nas-tool/warpkey.git
 cd warpkey
 ```
 

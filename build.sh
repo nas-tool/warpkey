@@ -6,7 +6,7 @@ OUTPUT_DIR="$SCRIPT_DIR/build"
 
 mkdir -p "$OUTPUT_DIR"
 
-PLATFORMS=("linux/amd64" "linux/arm64" "windows/amd64" "windows/arm64")
+PLATFORMS=("linux/amd64" "linux/arm64" "windows/amd64" "windows/arm64" "darwin/amd64" "darwin/arm64")
 
 for PLATFORM in "${PLATFORMS[@]}"; do
     IFS="/" read -r OS ARCH <<< "$PLATFORM"
