@@ -1,0 +1,73 @@
+name: Build and Release
+
+on:
+  workflow_dispatch:  # 只允许手动触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23.5'
+
+      - name: Build for all platforms
+        run: |
+          # 创建发布目录
+          mkdir -p release
+
+          # 定义目标平台
+          PLATFORMS=("linux/amd64" "linux/arm64" "darwin/amd64" "darwin/arm64" "windows/amd64" "windows/arm64")
+          
+          # 遍历并编译每个平台的版本
+          for PLATFORM in "${PLATFORMS[@]}"; do
+            # 分割操作系统和架构
+            IFS="/" read -r -a array <<< "$PLATFORM"
+            GOOS="${array[0]}"
+            GOARCH="${array[1]}"
+            
+            # 设置输出文件名
+            if [ "$GOOS" = "windows" ]; then
+              OUTPUT_NAME="warpkey-${GOOS}-${GOARCH}.exe"
+            else
+              OUTPUT_NAME="warpkey-${GOOS}-${GOARCH}"
+            fi
+            
+            echo "Building for $GOOS/$GOARCH..."
+            GOOS=$GOOS GOARCH=$GOARCH go build -o "release/$OUTPUT_NAME" main.go
+            
+            # 为非 Windows 版本添加执行权限
+            if [ "$GOOS" != "windows" ]; then
+              chmod +x "release/$OUTPUT_NAME"
+            fi
+            
+            # 创建压缩包
+            if [ "$GOOS" = "windows" ]; then
+              zip -j "release/${OUTPUT_NAME%.exe}.zip" "release/$OUTPUT_NAME"
+              rm "release/$OUTPUT_NAME"
+            else
+              tar -czf "release/${OUTPUT_NAME}.tar.gz" -C release "$OUTPUT_NAME"
+              rm "release/$OUTPUT_NAME"
+            fi
+          done
+
+      - name: Generate release tag
+        id: tag
+        run: |
+          echo "release_tag=release-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.tag.outputs.release_tag }}
+          name: Release ${{ steps.tag.outputs.release_tag }}
+          files: release/*
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
