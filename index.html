@@ -129,87 +129,79 @@
   <script>
     const messages = {
       en: {
-        menu: {
-          fullVersion: 'Full Version',
-          liteVersion: 'Lite Version',
-          about: 'About',
-          github: 'GitHub',
-          releases: 'Releases'
-        },
-        about: {
-          title: 'About',
-          description: 'This project is a CloudFlare WARP key collection tool. It fetches keys from Telegram and stores them locally.',
-          blog: 'You can find more information and updates on my blog',
-          readme: 'For more details, please refer to the',
-          update: 'Keys are updated to GitHub daily at Every Hour. Last update: 2025-10-30 16:09:27. You can directly obtain the latest key from this website.',
-        },
-        language: {
-          en: 'English',
-          zh: '中文'
-        },
-        table: {
-          keyColumn: 'WARP Key',
-          noData: 'No data available',
-          clickToCopy: 'Click to copy',
-          copySuccess: 'Copied to clipboard!',
-          copyFailed: 'Failed to copy, please try again'
-        },
-        notification: {
-          loading: 'Loading...',
-          error: 'Error occurred while fetching data'
-        }
+        full: 'Full Version',
+        lite: 'Lite Version',
+        about: 'About',
+        keyList: 'Available Keys',
+        refresh: 'Refresh',
+        noData: 'No keys yet',
+        copied: 'Copied to clipboard!',
+        aboutTitle: 'About',
+        aboutDesc: 'This project automatically collects Cloudflare WARP keys from Telegram and pushes them to GitHub every hour.',
+        update: 'Last GitHub Actions run'
       },
       zh: {
-        menu: {
-          fullVersion: '完整版',
-          liteVersion: '精简版',
-          about: '关于',
-          github: 'GitHub',
-          releases: 'Releases'
-        },
-        about: {
-          title: '关于',
-          description: '该项目是一个 CloudFlare WARP 密钥收集工具。它从 Telegram 获取密钥并将其存储在本地。',
-          blog: '你可以在我的博客中找到更多信息和更新',
-          readme: '有关详细信息，请参阅',
-          update: '密钥会每个小时自动push到本仓库中,你可以通过本站获取。最后更新: 2025-10-30 16:09:27',
-        },
-        language: {
-          en: 'English',
-          zh: '中文'
-        },
-        table: {
-          keyColumn: 'WARP 密钥',
-          noData: '暂无数据',
-          clickToCopy: '点击复制',
-          copySuccess: '已复制到剪贴板！',
-          copyFailed: '复制失败，请重试'
-        },
-        notification: {
-          loading: '加载中...',
-          error: '获取数据时发生错误'
-        }
+        full: '完整版',
+        lite: '精简版',
+        about: '关于',
+        keyList: '可用密钥',
+        refresh: '刷新',
+        noData: '暂无密钥',
+        copied: '已复制到剪贴板！',
+        aboutTitle: '关于',
+        aboutDesc: '本项目每小时自动从 Telegram 收集 Cloudflare WARP 密钥并推送至 GitHub。',
+        update: '最后一次 GitHub Actions 运行'
       }
-    };
+    }
 
-    new Vue({
-      el: '#app',
-      i18n: new VueI18n({
-        locale: localStorage.getItem('lang') || 'en',
-        messages
-      }),
-      data() {
-        return {
-          selectedMenu: 'full',
-          keys: [],
-          loading: false
-        };
-      },
-      methods: {
-        async fetchKeys() {
-          if (this.selectedMenu === 'about') return;
-          
-          this.loading = true;
+    const { createApp, ref, onMounted, watch } = Vue
+
+    createApp({
+      setup () {
+        const locale = ref(localStorage.getItem('lang') || 'en')
+        const isDark = ref(localStorage.getItem('dark') === 'true')
+        const mode = ref('lite')
+        const keys = ref([])
+        const loading = ref(false)
+        const copied = ref(false)
+        const lastUpdate = ref('')
+
+        const menus = [
+          { key: 'lite', label: 'lite' },
+          { key: 'full', label: 'full' },
+          { key: 'about', label: 'about' }
+        ]
+
+        const t = k => messages[locale.value][k]
+
+        const toggleDark = () => {
+          isDark.value = !isDark.value
+          localStorage.setItem('dark', isDark.value)
+          isDark.value
+            ? document.documentElement.classList.add('dark')
+            : document.documentElement.classList.remove('dark')
+        }
+
+        const switchLang = () => {
+          locale.value = locale.value === 'en' ? 'zh' : 'en'
+          localStorage.setItem('lang', locale.value)
+        }
+
+        /* 获取 Actions 最后一次成功运行时间 */
+        const fetchLastUpdate = async () => {
+          try {
+            const { data } = await axios.get('https://api.github.com/repos/nas-tool/warpkey/actions/runs?per_page=1&status=success')
+            const date = data.workflow_runs[0]?.updated_at || ''
+            lastUpdate.value = date
+              ? new Date(date).toLocaleString(locale.value === 'zh' ? 'zh-CN' : 'en-US')
+              : 'N/A'
+          } catch {
+            lastUpdate.value = 'N/A'
+          }
+        }
+
+        const loadKeys = async () => {
+          loading.value = true
           try {
             const { data } = await axios.get(
               `https://ghproxy.cfd/https://raw.githubusercontent.com/nas-tool/warpkey/main/data/${mode.value}`
