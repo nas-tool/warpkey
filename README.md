@@ -1,55 +1,36 @@
-# CloudFlare Warp KEY Collection Tool
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-[English](README.md) | [简体中文](README_CN.md) 
+## Getting Started
 
-## Direct Access
-
-You can directly access Warp KEY from the following URL (Update data every hour):
-
-- [https://raw.githubusercontent.com/nas-tool/warpkey/main/data/lite](https://raw.githubusercontent.com/nas-tool/warpkey/main/data/lite)
-- [https://raw.githubusercontent.com/nas-tool/warpkey/main/data/full](https://raw.githubusercontent.com/nas-tool/warpkey/main/data/full)
-
-You can also obtain it through my GitHub Pages:[CloudFlare WARP Key (nas-tool.github.io)](https://nas-tool.github.io/warpkey/)
-
-## Private Deployment
-
-### 1. Install Go
-
-Make sure you have Go installed. You can download and install Go from the [official Go website](https://golang.org/dl/).
-
-### 2. Clone the Project
-
-Clone this repository to your local environment:
+First, run the development server:
 
 ```bash
-git clone https://github.com/nas-tool/warpkey.git
-cd warpkey
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-### 3. Configure
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-If needed, you can edit the `main.go` file to adjust configurations.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-### 4. Run/Build
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-Once the Go environment is set up, you can use the following command to package the application:
+## Learn More
 
-```bash
-chmod a+x build.sh
-./build.sh
-```
-You can find the program you have compiled in the `./build` directory under the current directory.
+To learn more about Next.js, take a look at the following resources:
 
-The tool will collect keys from Telegram and save them in the `./data` directory under the current directory.
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-If you want to request the CloudFlare Key through a specific Socket or HTTP proxy, you can use the -- proxy parameter. Of course, you can also use the program - h to view specific usage help
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Deploy on Vercel
 
-## 5. Auto Update
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-You can use crontab to schedule tasks to execute the `update.sh `script in your project and submit the updates to your GitHub repository
-
-## License
-
-This project is licensed under the MIT License. For more details, please see the [LICENSE](LICENSE) file.
-
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
