@@ -23,9 +23,8 @@ This project now features a modern Web UI powered by Next.js and Vercel, providi
 
 You can access the latest Warp+ keys directly via our hosted API (updated hourly):
 
-- **Web Interface**: [https://warpkey.vercel.app](https://warpkey.vercel.app)
-- **Full List API**: [https://warpkey.vercel.app/api/full](https://warpkey.vercel.app/api/full)
-- **Lite List API**: [https://warpkey.vercel.app/api/lite](https://warpkey.vercel.app/api/lite)
+- **Web Interface**: https://warp-tool.vercel.app/
+
 
 ## 🛠️ Deployment
 
