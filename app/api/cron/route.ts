@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { updateKeys } from '@/lib/warp';
+import { fetchLiveData } from '@/lib/warp';
 
 export const dynamic = 'force-dynamic'; // static by default, unless reading the request
 
@@ -10,7 +10,7 @@ export async function GET(request: Request) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
-    const result = await updateKeys();
+    const result = await fetchLiveData();
     return NextResponse.json({ success: true, ...result });
   } catch (error) {
     console.error('Cron job failed:', error);

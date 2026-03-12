@@ -1,32 +1,25 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { Header } from '@/components/Header';
 import { getTranslations, getFormatter } from 'next-intl/server';
 import { CopyButton } from '@/components/CopyButton';
-import { ShieldCheck, Activity, Zap, RefreshCw } from 'lucide-react';
+import { ShieldCheck, Activity, Clock3, RefreshCw } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { BLOB_PATHS, readJsonFromBlob } from '@/lib/blob-storage';
-import { DiffState, KeyData } from '@/lib/warp';
+import { fetchLiveData } from '@/lib/warp';
 
 export const revalidate = 60; // Revalidate every minute
-
-async function getSafeBlobData<T>(pathname: string): Promise<T | null> {
-  return readJsonFromBlob<T>(pathname);
-}
 
 export default async function Home() {
   const t = await getTranslations('Home');
   const format = await getFormatter();
   
-  const diffState = await getSafeBlobData<DiffState>(BLOB_PATHS.diff);
-  const fullData = await getSafeBlobData<KeyData>(BLOB_PATHS.full);
-  const liteData = await getSafeBlobData<KeyData>(BLOB_PATHS.lite);
+  const live = await fetchLiveData();
+  const fullData = { keys: live.full, lastUpdated: live.lastUpdated };
+  const liteData = { keys: live.lite, lastUpdated: live.lastUpdated };
 
-  const lastUpdated = diffState?.lastUpdated || fullData?.lastUpdated || 0;
+  const lastUpdated = live.lastUpdated;
   const activeKeysCount = fullData?.keys?.length || 0;
-  const newKeysCount = diffState?.added?.length || 0;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -73,21 +66,7 @@ export default async function Home() {
             <CardContent>
               <div className="text-2xl font-bold">{activeKeysCount}</div>
               <p className="text-xs text-muted-foreground">
-                +0% from last hour
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {t('status.new')}
-              </CardTitle>
-              <Zap className="h-4 w-4 text-yellow-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">+{newKeysCount}</div>
-              <p className="text-xs text-muted-foreground">
-                In the latest update
+                Real-time fetched
               </p>
             </CardContent>
           </Card>
@@ -100,66 +79,36 @@ export default async function Home() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">~100</div>
-              <p className="text-xs text-muted-foreground">
-                Capacity limit per cycle
-              </p>
+              <p className="text-xs text-muted-foreground">Capacity cap per fetch</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                {t('status.lastFetch')}
+              </CardTitle>
+              <Clock3 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-sm font-medium">
+                {lastUpdated ? format.dateTime(lastUpdated, { dateStyle: 'medium', timeStyle: 'short' }) : '—'}
+              </div>
+              <p className="text-xs text-muted-foreground">Fetched on request</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Latest Updates Section */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold tracking-tight">{t('latestChanges')}</h2>
-          </div>
-          <Card>
-            <CardHeader>
-              <CardDescription>{t('latestChangesDesc')}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-green-500" />
-                    {t('addedKeys')}
-                  </h3>
-                  {diffState?.added && diffState.added.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {diffState.added.map((key) => (
-                        <div key={key} className="group relative">
-                          <Badge variant="outline" className="pl-2 pr-8 py-1 font-mono text-sm border-green-200 bg-green-50 text-green-700 hover:bg-green-100 hover:border-green-300 transition-colors">
-                            {key}
-                          </Badge>
-                          <CopyButton value={key} className="absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground italic">{t('noNewKeys')}</p>
-                  )}
-                </div>
-                <Separator />
-                <div>
-                  <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-red-500" />
-                    {t('removedKeys')}
-                  </h3>
-                  {diffState?.removed && diffState.removed.length > 0 ? (
-                    <div className="flex flex-wrap gap-2">
-                      {diffState.removed.map((key) => (
-                        <Badge key={key} variant="secondary" className="font-mono text-sm text-muted-foreground line-through opacity-70">
-                          {key}
-                        </Badge>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground italic">{t('noRemovedKeys')}</p>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Info Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle>实时拉取</CardTitle>
+            <CardDescription>{t('latestChangesDesc')}</CardDescription>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground space-y-2">
+            <p>每次访问实时抓取来源频道并刷新列表。</p>
+            <p>不再存储历史，所以不显示新增/删除对比。</p>
+          </CardContent>
+        </Card>
 
         {/* Lists Section */}
         <div className="grid gap-8 lg:grid-cols-2">
@@ -181,9 +130,6 @@ export default async function Home() {
                         <div className="flex items-center gap-3">
                           <span className="text-muted-foreground w-6 text-xs font-mono">{(i + 1).toString().padStart(2, '0')}</span>
                           <span className="font-mono text-sm font-medium">{key}</span>
-                          {diffState?.added.includes(key) && (
-                            <Badge className="bg-green-500 hover:bg-green-600 text-[10px] h-5 px-1.5">{t('new')}</Badge>
-                          )}
                         </div>
                         <CopyButton value={key} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>

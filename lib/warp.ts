@@ -1,5 +1,3 @@
-import { BLOB_PATHS, blobTokenExists, readJsonFromBlob, writeJsonToBlob } from './blob-storage';
-
 // Constants from main.go
 const SOURCES = [
   "https://t.me/s/warpplus",
@@ -10,22 +8,14 @@ const SOURCES = [
 
 const PATTERN = /<code>([A-Za-z0-9-]+)<\/code>/g;
 
-export interface WarpKey {
-  key: string;
-  firstSeen: number; // timestamp
-  lastSeen: number; // timestamp
-  status: 'new' | 'active' | 'removed'; 
-}
-
 export interface KeyData {
   keys: string[];
   lastUpdated: number;
 }
 
-export interface DiffState {
-  added: string[];
-  removed: string[];
-  kept: string[];
+export interface LiveData {
+  full: string[];
+  lite: string[];
   lastUpdated: number;
 }
 
@@ -67,57 +57,23 @@ export function shuffleArray<T>(array: T[]): T[] {
   return newArray;
 }
 
-export async function updateKeys() {
-  if (!blobTokenExists()) {
-    throw new Error('BLOB_READ_WRITE_TOKEN missing. Cannot update keys.');
-  }
-
+export async function fetchLiveData(): Promise<LiveData> {
   const currentKeys = await getAllKeys();
   const timestamp = Date.now();
 
-  // Get previous state from Blob
-  const previousData = await readJsonFromBlob<KeyData>(BLOB_PATHS.full);
-  const previousKeys = new Set(previousData?.keys || []);
-  
-  // Calculate diff
-  const currentSet = new Set(currentKeys);
-  const added = currentKeys.filter(k => !previousKeys.has(k));
-  const removed = [...previousKeys].filter(k => !currentSet.has(k));
-  const kept = currentKeys.filter(k => previousKeys.has(k));
-
-  // Store new full list
-  // Limit full list to 100 as per main.go logic? 
-  // main.go: "Generate full file with up to 100 keys"
   let fullList = [...currentKeys];
   if (fullList.length > 100) {
     fullList = fullList.slice(0, 100);
   }
 
-  // Store lite list
-  // main.go: "Generate lite file with up to 15 keys, shuffled"
   let liteList = shuffleArray([...fullList]);
   if (liteList.length > 15) {
     liteList = liteList.slice(0, 15);
   }
 
-  // Save to Blob
-  await writeJsonToBlob(BLOB_PATHS.full, { keys: fullList, lastUpdated: timestamp });
-  await writeJsonToBlob(BLOB_PATHS.lite, { keys: liteList, lastUpdated: timestamp });
-  
-  // Store diff history for the UI
-  // We want to show what changed in the *latest* update compared to the previous one.
-  // We can store a "diff_log" or just the last diff state.
-  const diffState: DiffState = {
-    added,
-    removed,
-    kept,
-    lastUpdated: timestamp
-  };
-  await writeJsonToBlob(BLOB_PATHS.diff, diffState);
-
   return {
     full: fullList,
     lite: liteList,
-    diff: diffState
+    lastUpdated: timestamp
   };
 }

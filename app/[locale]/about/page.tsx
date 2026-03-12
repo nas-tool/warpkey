@@ -73,7 +73,7 @@ export default async function About() {
             <h2 className="text-2xl font-bold tracking-tight">{t('directAccess')}</h2>
           </div>
           <p className="text-muted-foreground max-w-2xl">
-            {t('directAccessDesc')}
+            {t('directAccessDesc')} <span className="font-medium text-primary">（实时抓取，不落盘存储）</span>
           </p>
           
           <div className="grid gap-6 md:grid-cols-2">
