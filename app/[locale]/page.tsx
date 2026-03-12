@@ -1,4 +1,3 @@
-import { kv } from '@vercel/kv';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -8,41 +7,22 @@ import { getTranslations, getFormatter } from 'next-intl/server';
 import { CopyButton } from '@/components/CopyButton';
 import { ShieldCheck, Activity, Zap, RefreshCw } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { BLOB_PATHS, readJsonFromBlob } from '@/lib/blob-storage';
+import { DiffState, KeyData } from '@/lib/warp';
 
 export const revalidate = 60; // Revalidate every minute
 
-interface DiffState {
-  added: string[];
-  removed: string[];
-  kept: string[];
-  lastUpdated: number;
-}
-
-interface KeyData {
-  keys: string[];
-  lastUpdated: number;
-}
-
-async function getSafeKVData<T>(key: string): Promise<T | null> {
-  try {
-    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
-      // console.warn('KV environment variables missing. Returning null.');
-      return null;
-    }
-    return await kv.get<T>(key);
-  } catch (error) {
-    console.error(`Error fetching KV key ${key}:`, error);
-    return null;
-  }
+async function getSafeBlobData<T>(pathname: string): Promise<T | null> {
+  return readJsonFromBlob<T>(pathname);
 }
 
 export default async function Home() {
   const t = await getTranslations('Home');
   const format = await getFormatter();
   
-  const diffState = await getSafeKVData<DiffState>('warp_keys_diff');
-  const fullData = await getSafeKVData<KeyData>('warp_keys_full');
-  const liteData = await getSafeKVData<KeyData>('warp_keys_lite');
+  const diffState = await getSafeBlobData<DiffState>(BLOB_PATHS.diff);
+  const fullData = await getSafeBlobData<KeyData>(BLOB_PATHS.full);
+  const liteData = await getSafeBlobData<KeyData>(BLOB_PATHS.lite);
 
   const lastUpdated = diffState?.lastUpdated || fullData?.lastUpdated || 0;
   const activeKeysCount = fullData?.keys?.length || 0;

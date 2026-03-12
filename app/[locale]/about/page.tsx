@@ -32,16 +32,6 @@ export default async function About() {
     }
   ];
 
-  // In a real app, these would be dynamic based on the domain
-  const fullApiUrl = 'https://warpkey.vercel.app/api/full'; 
-  const liteApiUrl = 'https://warpkey.vercel.app/api/lite';
-  // But since we don't know the domain at build time easily in server component without headers, 
-  // and user might self-host, we can just show the path or relative URL for copy?
-  // Or just show "/api/full" and let user copy that. 
-  // Ideally absolute URL is better. 
-  // For now, I'll use relative path in display and maybe construct absolute in client?
-  // I'll stick to relative path for display to be safe.
-
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />

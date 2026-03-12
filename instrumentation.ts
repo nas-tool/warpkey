@@ -3,8 +3,8 @@ import { updateKeys } from '@/lib/warp';
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     // Only run on server-side
-    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
-      console.warn('[Instrumentation] KV environment variables missing. Skipping startup update.');
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      console.warn('[Instrumentation] BLOB_READ_WRITE_TOKEN missing. Skipping startup update.');
       return;
     }
 

@@ -33,12 +33,13 @@
 
 ### 方法一：Vercel 部署 (推荐)
 
-本项目针对 Vercel Serverless/Edge 环境和 Vercel KV (Redis) 进行了优化。
+本项目针对 Vercel Serverless/Edge 环境和 Vercel Blob 存储进行了优化。
 
 1.  **Fork** 本仓库到您的 GitHub。
 2.  在 Vercel 中 **Import** 该项目。
-3.  **配置存储**: 在 Vercel 控制台创建一个 KV Database (Redis) 并关联到本项目。
+3.  **配置存储**: 在 Vercel 控制台添加 Blob 集成，并确保项目中存在 `BLOB_READ_WRITE_TOKEN` 环境变量。
 4.  **设置环境变量**:
+    *   `BLOB_READ_WRITE_TOKEN`: Vercel Blob 集成提供的读写令牌，用于访问存储的 JSON 文件。
     *   `CRON_SECRET`: 设置一个复杂的随机字符串，用于保护定时任务接口。
     *   `NEXT_PUBLIC_APP_URL`: 您的 Vercel 部署域名 (例如 `https://your-app.vercel.app`)。
 5.  **定时任务**: 项目根目录下的 `vercel.json` 已配置好 Cron Job，部署后会自动生效（每小时运行）。

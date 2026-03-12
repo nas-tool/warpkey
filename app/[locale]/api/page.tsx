@@ -2,7 +2,7 @@ import { Header } from '@/components/Header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { getTranslations } from 'next-intl/server';
-import { Terminal, ExternalLink, Code, CloudDownload, Copy } from 'lucide-react';
+import { Terminal, ExternalLink, CloudDownload } from 'lucide-react';
 import { CopyButton } from '@/components/CopyButton';
 
 export default async function ApiDocs() {

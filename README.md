@@ -31,12 +31,13 @@ You can access the latest Warp+ keys directly via our hosted API (updated hourly
 
 ### Method 1: Vercel (Recommended)
 
-This project is optimized for Vercel Serverless/Edge functions with Vercel KV (Redis).
+This project is optimized for Vercel Serverless/Edge functions with Vercel Blob storage.
 
 1.  **Fork** this repository.
 2.  **Deploy** to Vercel.
-3.  **Configure Storage**: Create a Vercel KV store and link it to your project.
+3.  **Configure Storage**: Add the Vercel Blob integration and ensure `BLOB_READ_WRITE_TOKEN` is available to your project.
 4.  **Set Environment Variables**:
+    *   `BLOB_READ_WRITE_TOKEN`: Provided by the Vercel Blob integration for reading/writing the JSON files.
     *   `CRON_SECRET`: A secure random string for protecting the cron endpoint.
     *   `NEXT_PUBLIC_APP_URL`: Your Vercel app URL (e.g., `https://your-app.vercel.app`).
 5.  **Setup Cron Job**: The `vercel.json` is already configured to run the update job hourly.

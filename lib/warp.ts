@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { BLOB_PATHS, blobTokenExists, readJsonFromBlob, writeJsonToBlob } from './blob-storage';
 
 // Constants from main.go
 const SOURCES = [
@@ -19,6 +19,13 @@ export interface WarpKey {
 
 export interface KeyData {
   keys: string[];
+  lastUpdated: number;
+}
+
+export interface DiffState {
+  added: string[];
+  removed: string[];
+  kept: string[];
   lastUpdated: number;
 }
 
@@ -61,11 +68,15 @@ export function shuffleArray<T>(array: T[]): T[] {
 }
 
 export async function updateKeys() {
+  if (!blobTokenExists()) {
+    throw new Error('BLOB_READ_WRITE_TOKEN missing. Cannot update keys.');
+  }
+
   const currentKeys = await getAllKeys();
   const timestamp = Date.now();
 
-  // Get previous state from KV
-  const previousData = await kv.get<KeyData>('warp_keys_full');
+  // Get previous state from Blob
+  const previousData = await readJsonFromBlob<KeyData>(BLOB_PATHS.full);
   const previousKeys = new Set(previousData?.keys || []);
   
   // Calculate diff
@@ -89,20 +100,20 @@ export async function updateKeys() {
     liteList = liteList.slice(0, 15);
   }
 
-  // Save to KV
-  await kv.set('warp_keys_full', { keys: fullList, lastUpdated: timestamp });
-  await kv.set('warp_keys_lite', { keys: liteList, lastUpdated: timestamp });
+  // Save to Blob
+  await writeJsonToBlob(BLOB_PATHS.full, { keys: fullList, lastUpdated: timestamp });
+  await writeJsonToBlob(BLOB_PATHS.lite, { keys: liteList, lastUpdated: timestamp });
   
   // Store diff history for the UI
   // We want to show what changed in the *latest* update compared to the previous one.
   // We can store a "diff_log" or just the last diff state.
-  const diffState = {
+  const diffState: DiffState = {
     added,
     removed,
     kept,
     lastUpdated: timestamp
   };
-  await kv.set('warp_keys_diff', diffState);
+  await writeJsonToBlob(BLOB_PATHS.diff, diffState);
 
   return {
     full: fullList,
