@@ -1,7 +1,8 @@
 import { get, put } from '@vercel/blob';
 
 const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
-const ACCESS = 'public' as const;
+// Use private access to match default Blob store permissions; server-side routes proxy data out.
+const ACCESS = 'private' as const;
 
 async function streamToString(stream: ReadableStream | null): Promise<string> {
   if (!stream) return '';
