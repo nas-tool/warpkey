@@ -6,6 +6,10 @@ import {Geist, Geist_Mono} from "next/font/google";
 import "../globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
+function isValidLocale(locale: string): locale is (typeof routing.locales)[number] {
+  return routing.locales.includes(locale as (typeof routing.locales)[number]);
+}
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -26,12 +30,12 @@ export default async function LocaleLayout({
   params
 }: {
   children: React.ReactNode;
-  params: {locale: string};
+  params: Promise<{locale: string}>;
 }) {
-  const {locale} = params;
+  const {locale} = await params;
   
   // Ensure that the incoming `locale` is valid
-  if (!routing.locales.includes(locale)) {
+  if (!isValidLocale(locale)) {
     notFound();
   }
 

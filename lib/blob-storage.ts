@@ -47,7 +47,6 @@ export async function writeJsonToBlob(pathname: string, data: unknown) {
     token: BLOB_TOKEN,
     addRandomSuffix: false,
     contentType: 'application/json',
-    cacheControl: 'max-age=0, s-maxage=0, must-revalidate',
   });
 }
 
