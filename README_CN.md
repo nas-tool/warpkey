@@ -23,10 +23,7 @@
 
 您可以直接通过我们要托管的 API 获取最新的 Warp+ 密钥（每小时更新）：
 
-- **Web 界面**: [https://warpkey.vercel.app](https://warpkey.vercel.app)
-- **完整列表 API**: [https://warpkey.vercel.app/api/full](https://warpkey.vercel.app/api/full)
-- **精简列表 API**: [https://warpkey.vercel.app/api/lite](https://warpkey.vercel.app/api/lite)
-
+- **Web 界面**: https://warp-tool.vercel.app/
 也可以访问我的博客获取更多信息：[Haoyu Wang's Blog](https://www.wanghaoyu.com.cn/archives/cloudflare-warp-key.html)
 
 ## 🛠️ 部署指南
